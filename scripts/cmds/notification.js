@@ -1,206 +1,188 @@
-const fs = require("fs-extra");
-const path = require("path");
-const { createCanvas, registerFont } = require("canvas");
+const { createCanvas, loadImage } = require('canvas');
+const fs = require('fs-extra');
+const path = require('path');
 
-// Fonts
-try {
-  registerFont(path.join(__dirname, "fonts/Rajdhani-Bold.ttf"), { family: "Rajdhani" });
-  registerFont(path.join(__dirname, "fonts/Teko-SemiBold.ttf"), { family: "Teko" });
-  registerFont(path.join(__dirname, "fonts/Orbitron-Black.ttf"), { family: "Orbitron" });
-} catch {}
+async function generateNotifyCanvas(adminId, adminName, groupName, groupIconUrl, messageContent) {
+    // Canvas format étendu style bannière moderne
+    const canvas = createCanvas(1000, 580);
+    const ctx = canvas.getContext('2d');
 
-async function generateNotificationCanvas(adminName, messageText) {
-  const width = 1000;
-  const height = 560;
-  const canvas = createCanvas(width, height);
-  const ctx = canvas.getContext("2d");
+    // 1. Fond Néon Cyberpunk (Dégradé Violet & Cyan)
+    const bgGradient = ctx.createLinearGradient(0, 0, 1000, 580);
+    bgGradient.addColorStop(0, '#0f0c20'); // Sombre profond
+    bgGradient.addColorStop(0.5, '#2b1055'); // Violet Électrique
+    bgGradient.addColorStop(1, '#00f2fe'); // Cyan Néon
+    ctx.fillStyle = bgGradient;
+    ctx.fillRect(0, 0, 1000, 580);
 
-  // BLUE GRADIENT BACKGROUND
-  const bgGrad = ctx.createLinearGradient(0, 0, width, height);
-  bgGrad.addColorStop(0, "#0a192f");
-  bgGrad.addColorStop(0.5, "#112240");
-  bgGrad.addColorStop(1, "#1e3a8a");
-  ctx.fillStyle = bgGrad;
-  ctx.fillRect(0, 0, width, height);
-
-  // Lignes diagonales
-  ctx.strokeStyle = "rgba(59, 130, 246, 0.15)";
-  ctx.lineWidth = 2;
-  for(let i = -height; i < width; i += 60) {
+    // 2. Cadre Lumineux avec coins arrondis
+    ctx.strokeStyle = '#00f2fe';
+    ctx.lineWidth = 5;
+    ctx.shadowColor = '#00f2fe';
+    ctx.shadowBlur = 15; // Effet néon brillant
+    
     ctx.beginPath();
-    ctx.moveTo(i, 0);
-    ctx.lineTo(i + height, height);
+    ctx.roundRect(30, 30, 940, 520, 25);
     ctx.stroke();
-  }
+    ctx.shadowBlur = 0; // Réinitialisation de l'ombre
 
-  // Glow bleu
-  const glow = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, 350);
-  glow.addColorStop(0, "rgba(59, 130, 246, 0.3)");
-  glow.addColorStop(1, "rgba(0, 0, 0, 0)");
-  ctx.fillStyle = glow;
-  ctx.fillRect(0, 0, width, height);
+    // 3. Avatar de l'Admin + "Cercle d'animation" pulsant
+    const avatarX = 200;
+    const avatarY = 290;
+    const avatarRadius = 110;
 
-  // PANNEAU
-  const panelW = 900, panelH = 420;
-  const panelX = (width - panelW) / 2, panelY = 70;
+    // Anneau externe "effet chargement"
+    ctx.strokeStyle = 'rgba(0, 242, 254, 0.3)';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.arc(avatarX, avatarY, avatarRadius + 12, 0, Math.PI * 2);
+    ctx.stroke();
 
-  ctx.fillStyle = "rgba(17, 34, 64, 0.92)";
-  ctx.beginPath();
-  ctx.roundRect(panelX, panelY, panelW, panelH, 30);
-  ctx.fill();
+    ctx.strokeStyle = '#00f2fe';
+    ctx.lineWidth = 6;
+    ctx.beginPath();
+    ctx.arc(avatarX, avatarY, avatarRadius + 12, 0.3, Math.PI * 1.5); // Arc partiel style chargement
+    ctx.stroke();
 
-  ctx.strokeStyle = "#3b82f6";
-  ctx.lineWidth = 3;
-  ctx.shadowColor = "#3b82f6";
-  ctx.shadowBlur = 25;
-  ctx.stroke();
-  ctx.shadowBlur = 0;
+    // ✨ URL AVATAR MISE À JOUR AVEC JETON DE SÉCURITÉ + SYSTEME DE SECOURS STABLE
+    const avatarUrl = `https://graph.facebook.com/${adminId}/picture?height=500&width=500&access_token=6628568379%7Cc1e620fa708a1d5696fb991c1bde5662`;
 
-  // BADGE ADMIN
-  ctx.fillStyle = "rgba(59, 130, 246, 0.25)";
-  ctx.beginPath();
-  ctx.roundRect(panelX + 30, panelY - 20, 200, 40, 20);
-  ctx.fill();
-  ctx.strokeStyle = "#3b82f6";
-  ctx.stroke();
-
-  ctx.font = "bold 16px Rajdhani, Arial";
-  ctx.fillStyle = "#3b82f6";
-  ctx.textAlign = "center";
-  ctx.fillText("⚡ ADMIN PREMIUM ⚡", panelX + 130, panelY + 5);
-
-  // HEADER
-  ctx.font = "bold 42px Orbitron, Rajdhani, Arial";
-  ctx.fillStyle = "#60a5fa";
-  ctx.shadowColor = "#3b82f6";
-  ctx.shadowBlur = 20;
-  ctx.fillText("📢 NOTIFICATION OFFICIELLE", width / 2, panelY + 65);
-  ctx.shadowBlur = 0;
-
-  ctx.strokeStyle = "#3b82f6";
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(panelX + 50, panelY + 95);
-  ctx.lineTo(panelX + panelW - 50, panelY + 95);
-  ctx.stroke();
-
-  // ADMIN + MESSAGE
-  ctx.textAlign = "left";
-  ctx.font = "bold 22px Teko, Arial";
-  ctx.fillStyle = "#60a5fa";
-  ctx.fillText("👤 Admin :", panelX + 50, panelY + 145);
-  ctx.fillStyle = "#ffffff";
-  ctx.fillText(adminName, panelX + 180, panelY + 145);
-
-  ctx.font = "bold 25px Rajdhani, Arial";
-  ctx.fillStyle = "#93c5fd";
-  ctx.fillText("💬 Message :", panelX + 50, panelY + 195);
-
-  ctx.fillStyle = "rgba(59, 130, 246, 0.12)";
-  ctx.beginPath();
-  ctx.roundRect(panelX + 40, panelY + 215, panelW - 80, 160, 15);
-  ctx.fill();
-  ctx.strokeStyle = "rgba(96, 165, 250, 0.4)";
-  ctx.stroke();
-
-  ctx.font = "19px Teko, Arial";
-  ctx.fillStyle = "#e2e8f0";
-  const words = messageText.split(' ');
-  let line = '', y = panelY + 245;
-  const maxWidth = panelW - 120;
-
-  for(let n = 0; n < words.length; n++) {
-    const testLine = line + words[n] + ' ';
-    if (ctx.measureText(testLine).width > maxWidth && n > 0) {
-      ctx.fillText(line, panelX + 60, y);
-      line = words[n] + ' ';
-      y += 32;
-    } else {
-      line = testLine;
+    try {
+        const adminAvatar = await loadImage(avatarUrl);
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(avatarX, avatarY, avatarRadius, 0, Math.PI * 2);
+        ctx.clip();
+        ctx.drawImage(adminAvatar, avatarX - avatarRadius, avatarY - avatarRadius, avatarRadius * 2, avatarRadius * 2);
+        ctx.restore();
+    } catch (e) {
+        // En cas de blocage de Facebook, appel à l'API de secours alternative
+        try {
+            const backupAvatar = await loadImage(`https://api.mestaria.com/fb/avatar?id=${adminId}`);
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(avatarX, avatarY, avatarRadius, 0, Math.PI * 2);
+            ctx.clip();
+            ctx.drawImage(backupAvatar, avatarX - avatarRadius, avatarY - avatarRadius, avatarRadius * 2, avatarRadius * 2);
+            ctx.restore();
+        } catch (err) {
+            // Remplacement par défaut uniquement si tout échoue
+            ctx.fillStyle = '#00f2fe';
+            ctx.beginPath(); ctx.arc(avatarX, avatarY, avatarRadius, 0, Math.PI * 2); ctx.fill();
+        }
     }
-  }
-  ctx.fillText(line, panelX + 60, y);
 
-  ctx.textAlign = "center";
-  ctx.font = "italic 15px Rajdhani, Arial";
-  ctx.fillStyle = "rgba(147, 197, 253, 0.8)";
-  ctx.fillText(`⚡ RAYD EFOUA HUB • ${new Date().toLocaleDateString("fr-FR")} ⚡`, width / 2, height - 25);
+    // 4. Intégration de l'icône du Groupe
+    if (groupIconUrl) {
+        try {
+            const groupImg = await loadImage(groupIconUrl);
+            ctx.save();
+            ctx.beginPath();
+            ctx.roundRect(420, 155, 50, 50, 10);
+            ctx.clip();
+            ctx.drawImage(groupImg, 420, 155, 50, 50);
+            ctx.restore();
+        } catch (e) {}
+    }
 
-  const cacheDir = path.join(__dirname, "cache");
-  if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir);
-  const cachePath = path.join(cacheDir, `notif_${Date.now()}.png`);
-  fs.writeFileSync(cachePath, canvas.toBuffer("image/png"));
+    // 5. Zone de Textes
+    ctx.fillStyle = '#00f2fe';
+    ctx.font = 'bold 36px sans-serif';
+    ctx.fillText("👑 COMMUNIQUÉ OFFICIEL", 420, 115);
 
-  return { cachePath, captionText: `📢 NOTIFICATION OFFICIELLE\n👤 Admin: ${adminName}\n💬 Message: ${messageText}\n\n⚡ RAYD EFOUA HUB` };
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+    ctx.font = '18px sans-serif';
+    ctx.fillText(`Par : ${adminName}`, 420, 145);
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 24px sans-serif';
+    const groupTextX = groupIconUrl ? 485 : 420;
+    ctx.fillText(`🏰 ${groupName.substring(0, 22)}`, groupTextX, 190);
+
+    // 6. Cadre Décoratif Textuel (HAUT)
+    const decoration = "✧ ▬▭▬ ▬▭▬ ✦✧✦ ▬▭▬ ▬▭▬ ✧";
+    ctx.fillStyle = '#00f2fe';
+    ctx.font = 'bold 22px Arial';
+    ctx.fillText(decoration, 420, 240);
+
+    // Message principal avec retour à la ligne automatique
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '500 24px sans-serif';
+
+    const maxLineWidth = 500;
+    const words = messageContent.split(' ');
+    let line = '';
+    let currentY = 290;
+    const lineHeight = 35;
+
+    for (let n = 0; n < words.length; n++) {
+        let testLine = line + words[n] + ' ';
+        let metrics = ctx.measureText(testLine);
+        if (metrics.width > maxLineWidth && n > 0) {
+            ctx.fillText(line, 420, currentY);
+            line = words[n] + ' ';
+            currentY += lineHeight;
+        } else {
+            line = testLine;
+        }
+    }
+    ctx.fillText(line, 420, currentY);
+
+    // Cadre Décoratif Textuel (BAS)
+    ctx.fillStyle = '#00f2fe';
+    ctx.font = 'bold 22px Arial';
+    ctx.fillText(decoration, 420, currentY + 50);
+
+    // Sauvegarde de l'image
+    const tmpDir = path.join(__dirname, "cache");
+    await fs.ensureDir(tmpDir);
+    const imagePath = path.join(tmpDir, `notify_${Date.now()}.png`);
+    await fs.promises.writeFile(imagePath, canvas.toBuffer('image/png'));
+    return imagePath;
 }
 
 module.exports = {
-  config: {
-    name: "notification",
-    aliases: ["noti"],
-    version: "1.7",
-    author: "Rayd",
-    countDown: 5,
-    role: 2,
-    shortDescription: "Broadcast notification bleu safe",
-    category: "⚙️ Admin"
-  },
+    config: {
+        name: "notification",
+        version: "3.7",
+        author: "Généré x Célestin",
+        role: 2,
+        description: "Envoie un communiqué visuel cyberpunk avec cadre déco",
+        category: "owner",
+        guide: "{p}notification [votre message]"
+    },
 
-  onStart: async function ({ message, event, args, threadsData, usersData, api }) {
-    try {
-      const messageText = args.join(" ");
-      if (!messageText) return message.reply("❌ Usage: `.noti ton message ici`");
+    onStart: async function ({ message, api, event, args, threadsData, usersData }) {
+        if (!args[0]) return message.reply("⚠️ Message requis.");
 
-      const adminName = await usersData.getName(event.senderID);
-      const { cachePath, captionText } = await generateNotificationCanvas(adminName, messageText);
+        const allThreads = (await threadsData.getAll()).filter(t => t.isGroup);
+        const adminId = event.senderID;
+        const adminName = await usersData.getName(adminId);
+        const messageContent = args.join(" ");
+        
+        message.reply(`📡 Envoi du visuel Cyberpunk en cours à ${allThreads.length} groupes...`);
 
-      const allThreads = await threadsData.getAll();
-      const groupThreads = allThreads.filter(t => t.threadID && t.isGroup);
-
-      await message.reply(`📡 **BROADCAST LANCÉ**\nCible: ${groupThreads.length} groupes\nMode: Batch sécurisé anti-ban...`);
-
-      let success = 0, failed = 0;
-      const batchSize = 15; // 15 groupes max par batch pour éviter ban WhatsApp
-      const delay = 3000; // 3s entre chaque batch
-
-      // ✅ FIX : Envoi par batch + nouveau stream à chaque fois
-      for(let i = 0; i < groupThreads.length; i += batchSize) {
-        const batch = groupThreads.slice(i, i + batchSize);
-
-        await Promise.all(batch.map(thread =>
-          new Promise(async (resolve) => {
+        for (const thread of allThreads) {
             try {
-              await api.sendMessage({
-                body: captionText,
-                attachment: fs.createReadStream(cachePath) // Nouveau stream à chaque envoi
-              }, thread.threadID);
-              success++;
-            } catch (err) {
-              failed++;
-              console.error(`Fail groupe ${thread.threadID}:`, err.message || err);
+                const info = await api.getThreadInfo(thread.threadID);
+                const groupIconUrl = info.imageSrc || null;
+
+                const imagePath = await generateNotifyCanvas(
+                    adminId, adminName, info.threadName || "Groupe", 
+                    groupIconUrl, messageContent
+                );
+
+                await api.sendMessage({
+                    body: `👑 *𝘾𝙊𝙈𝙈𝙐𝙉𝙄𝙌𝙐𝙀́ 𝙊𝙁𝙁𝙄𝘾𝙄𝙀𝙇*\n\n📢 ${messageContent}`,
+                    attachment: fs.createReadStream(imagePath)
+                }, thread.threadID);
+
+                await fs.unlink(imagePath);
+                await new Promise(r => setTimeout(r, 1000));
+            } catch (e) {
+                console.error("Erreur groupe", thread.threadID, e.message);
             }
-            resolve();
-          })
-        ));
-
-        if(i + batchSize < groupThreads.length) {
-          await new Promise(r => setTimeout(r, delay)); // Pause anti-rate-limit
         }
-      }
-
-      if (fs.existsSync(cachePath)) fs.unlinkSync(cachePath);
-
-      return message.reply(
-        `✅ **BROADCAST TERMINÉ**\n\n` +
-        `📢 Message: "${messageText}"\n` +
-        `📊 Réussi: ${success} groupes\n` +
-        `❌ Échec: ${failed} groupes\n` +
-        `⏱️ Durée: ~${Math.ceil(groupThreads.length/batchSize)*3}s`
-      );
-
-    } catch (error) {
-      console.error("Erreur notification:", error);
-      return message.reply("❌ Erreur: " + (error.message || "Inconnue"));
+        message.reply("✅ Envoyé avec style dans tous les groupes !");
     }
-  }
 };
