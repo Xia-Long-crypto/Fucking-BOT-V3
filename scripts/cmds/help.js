@@ -59,51 +59,63 @@ function roundRect(ctx, x, y, width, height, radius) {
 }
 
 async function generateHelpCanvas(prefix, categoriesData, totalCmds) {
-  // PAYSAGE 1920x1080 FOND NOIR
+  // PAYSAGE 1920x1080 FOND CYBER
   const width = 1920, height = 1080;
   const canvas = createCanvas(width, height);
   const ctx = canvas.getContext("2d");
 
-  // 1. FOND NOIR PUR
+  // 1. FOND NOIR + GRILLE CYBER
   ctx.fillStyle = "#000";
   ctx.fillRect(0, 0, width, height);
 
-  // Effet scanline subtil
-  ctx.fillStyle = "rgba(255, 20, 147, 0.02)";
-  for(let i = 0; i < height; i += 3) {
-    ctx.fillRect(0, i, width, 1);
+  // Grille néon subtile
+  ctx.strokeStyle = "rgba(0, 255, 255, 0.08)";
+  ctx.lineWidth = 1;
+  for(let i = 0; i < width; i += 50) {
+    ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, height); ctx.stroke();
+  }
+  for(let i = 0; i < height; i += 50) {
+    ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(width, i); ctx.stroke();
   }
 
-  // 2. HEADER ROSE NEON
+  // Particules cyan
+  ctx.fillStyle = "rgba(0, 255, 255, 0.15)";
+  for(let i = 0; i < 120; i++) {
+    ctx.beginPath();
+    ctx.arc(Math.random() * width, Math.random() * height, Math.random() * 1.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // 2. HEADER CYBER NÉON
   ctx.textAlign = "center";
-  ctx.font = "bold 50px Arial";
-  ctx.fillStyle = "#FF1493";
-  ctx.shadowColor = "#FF1493";
-  ctx.shadowBlur = 20;
-  ctx.fillText("01F 339 🌹 Rayd Bot Commands 🌹 01F 339", width/2, 65);
+  ctx.font = "bold 52px Arial";
+  ctx.fillStyle = "#00FFFF"; // Cyan néon
+  ctx.shadowColor = "#00FFFF";
+  ctx.shadowBlur = 25;
+  ctx.fillText("⚡ RAYD BOT COMMANDS ⚡", width/2, 70);
   ctx.shadowBlur = 0;
 
-  ctx.font = "22px Arial";
-  ctx.fillStyle = "#FF69B4";
+  ctx.font = "20px Arial";
+  ctx.fillStyle = "#00CCFF";
   const activeCats = Object.keys(categoriesData).filter(k => categoriesData[k].length > 0);
-  ctx.fillText(`Prefix: ${prefix} | ${totalCmds} commandes | ${activeCats.length} catégories`, width/2, 100);
+  ctx.fillText(`PREFIX: ${prefix} | ${totalCmds} COMMANDS | ${activeCats.length} CATEGORIES`, width/2, 105);
 
-  // Ligne séparatrice néon
-  ctx.strokeStyle = "#FF1493";
-  ctx.lineWidth = 2;
-  ctx.shadowColor = "#FF1493";
-  ctx.shadowBlur = 10;
+  // Ligne séparatrice CYAN NÉON au lieu de barre rose
+  ctx.strokeStyle = "#00FFFF";
+  ctx.lineWidth = 1.5;
+  ctx.shadowColor = "#00FFFF";
+  ctx.shadowBlur = 15;
   ctx.beginPath();
-  ctx.moveTo(60, 120);
-  ctx.lineTo(width - 60, 120);
+  ctx.moveTo(80, 130);
+  ctx.lineTo(width - 80, 130);
   ctx.stroke();
   ctx.shadowBlur = 0;
 
   // 3. 2 COLONNES PAYSAGE
-  let y1 = 160, y2 = 160;
-  const col1X = 60, col2X = 990;
-  const colWidth = 870;
-  let captionText = `🌹 Rayd Bot Commands 🌹\nPrefix: ${prefix} | ${totalCmds} commandes\n\n`;
+  let y1 = 170, y2 = 170;
+  const col1X = 80, col2X = 1000;
+  const colWidth = 840;
+  let captionText = `⚡ RAYD BOT COMMANDS ⚡\nPREFIX: ${prefix} | ${totalCmds} COMMANDS\n\n`;
 
   const sortedCats = activeCats.sort();
   const mid = Math.ceil(sortedCats.length / 2);
@@ -114,44 +126,55 @@ async function generateHelpCanvas(prefix, categoriesData, totalCmds) {
     let y = isCol1? y1 : y2;
     const x = isCol1? col1X : col2X;
 
-    // Barre de catégorie ROSE NEON
-    ctx.fillStyle = "#FF1493";
-    ctx.shadowColor = "#FF1493";
-    ctx.shadowBlur = 8;
-    roundRect(ctx, x, y - 22, colWidth, 30, 6);
-    ctx.fill();
+    // TITRE CATÉGORIE CYAN au lieu de barre rose
+    ctx.font = "bold 18px Arial";
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#00FFFF";
+    ctx.shadowColor = "#00FFFF";
+    ctx.shadowBlur = 10;
+    ctx.fillText(`${getCategoryEmoji(catName)} ${catName.toUpperCase()} [${cmds.length}]`, x, y);
     ctx.shadowBlur = 0;
 
-    ctx.fillStyle = "#000000";
-    ctx.font = "bold 17px Arial";
-    ctx.textAlign = "left";
-    ctx.fillText(`${getCategoryEmoji(catName)} ${catName.toUpperCase()} [${cmds.length}]`, x + 12, y);
-    y += 35;
+    // Ligne sous le titre
+    ctx.strokeStyle = "rgba(0, 255, 255, 0.3)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x, y + 8);
+    ctx.lineTo(x + 300, y + 8);
+    ctx.stroke();
 
+    y += 30;
     captionText += `═══ ${catName.toUpperCase()} ═══\n`;
 
-    // Commandes en blanc
+    // Commandes en blanc avec effet néon léger
     ctx.font = "15px Consolas";
-    ctx.fillStyle = "#FFFFFF";
+    ctx.fillStyle = "#E0E0E0";
     cmds.forEach(cmd => {
-      ctx.fillText(`> ${cmd}`, x + 12, y);
+      ctx.fillStyle = "#FFFFFF";
+      ctx.shadowColor = "rgba(0,255,255,0.2)";
+      ctx.shadowBlur = 3;
+      ctx.fillText(`> ${cmd}`, x + 5, y);
+      ctx.shadowBlur = 0;
       captionText += `${cmd} `;
       y += 22;
     });
 
     captionText += `\n\n`;
-    y += 8;
+    y += 10;
 
     if(isCol1) y1 = y; else y2 = y;
   });
 
-  captionText += `🌹 Powered by Rayd Bot 2026 🌹`;
+  captionText += `⚡ Powered by RAYD BOT 2026 ⚡`;
 
-  // 4. FOOTER
+  // 4. FOOTER CYBER
   ctx.textAlign = "right";
   ctx.font = "14px Arial";
-  ctx.fillStyle = "#FF69B4";
-  ctx.fillText(`SYSTEM: Rayd v9.4 | ${new Date().toLocaleString('fr-FR')}`, width - 60, height - 25);
+  ctx.fillStyle = "#00CCFF";
+  ctx.shadowColor = "#00CCFF";
+  ctx.shadowBlur = 8;
+  ctx.fillText(`SYSTEM: RAYD v9.5 CYBER | ${new Date().toLocaleString('fr-FR')}`, width - 80, height - 30);
+  ctx.shadowBlur = 0;
 
   const cacheDir = path.join(process.cwd(), "cache");
   await fs.ensureDir(cacheDir);
@@ -164,13 +187,13 @@ async function generateHelpCanvas(prefix, categoriesData, totalCmds) {
 module.exports = {
   config: {
     name: "help",
-    version: "9.4.0",
+    version: "9.5.0",
     author: "Rayd",
     role: 0,
     countDown: 5,
     description: {
-      fr: "🌹 Affiche toutes les commandes du bot sur fond noir",
-      en: "🌹 Show all bot commands on black background"
+      fr: "🌹 Affiche toutes les commandes du bot style Cyber",
+      en: "🌹 Show all bot commands Cyber style"
     },
     category: "Info",
     guide: {
@@ -199,7 +222,7 @@ module.exports = {
       const usage = typeof cfg.guide?.fr === "string"? cfg.guide.fr.replace(/\{pn\}/g, prefix + cfg.name) : `${prefix}${cfg.name}`;
       const aliasesList = cfg.aliases? cfg.aliases.map(a => `${prefix}${a}`).join(", ") : "None";
 
-      const helpMessage = `┍━━━[ 🌹 ${toBold("RAYD HELP")} ]━━━◊
+      const helpMessage = `┍━━━[ ⚡ ${toBold("RAYD HELP")} ]━━━◊
 ┋➥ 📛 ${toBold("Name")}: ${prefix}${cfg.name}
 ┋➥ 🗂️ ${toBold("Category")}: ${getCategoryEmoji(cfg.category)} ${cfg.category}
 ┋➥ 📄 ${toBold("Description")}: ${desc}
