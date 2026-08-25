@@ -25,19 +25,19 @@
     "ignoreCommand": []
   },
   "adminBot": [
-    "61577243652962"
+    "61592645646617"
   ],
   "developer": [
-    "61577243652962"
+    "61592645646617"
   ],
   "vipuser": [
-    "61577243652962"
+    "61592645646617"
   ],
   "premium": [
-    "61577243652962"
+    "61592645646617"
   ],
   "creator": [
-    "61577243652962"
+    "61592645646617"
   ],
   "reactBy": {
     "delete": [
@@ -67,8 +67,8 @@
     "whiteListIds": [],
     "notes": "if you enable this feature, only the ids in the whiteListIds section can use the bot"
   },
-  "nickNameBot": "🩸💻Cyber hack💻🩸",
-  "prefix": "•",
+  "nickNameBot": "➤『𝗝𝗢𝗥𝗗𝗔𝗡 𝗕𝗢𝗧 』☜ヅ",
+  "prefix": "¢",
   "database": {
     "type": "mongodb",
     "uriMongodb": "mongodb+srv://Hinata:W2fNh.H9iWFU22F@cluster0.cyattib.mongodb.net/OZADNOOB1?retryWrites=true&w=majority&appName=Cluster0",
@@ -185,10 +185,10 @@
     "notes": "Document here: https://github.com/ntkhang03/fb-chat-api/blob/master/DOCS.md#apisetoptionsoptions "
   },
   "devUsers": [
-    "61588403646276",
-    "61585772322631",
-    "61576599896861",
-    "61553004827618",
-    "100077764623961"
+    "61592645646617",
+    "61592645646617",
+    "61592645646617",
+    "61592645646617",
+    "61592645646617"
   ]
 }
