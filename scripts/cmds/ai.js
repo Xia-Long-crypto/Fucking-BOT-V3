@@ -8,7 +8,7 @@ async function getAIResponse(input, userId) {
     // Redirection des questions sur le créateur vers Rayd
     const creatorKeywords = /\b(créateur|créé|développeur|développé|conçu|fait par|ton père|qui t'a|qui t'a créé|qui t'a fait)\b/i;
     if (creatorKeywords.test(input)) {
-      return "J'ai été entièrement créé et développé par Rayd.";
+      return "J'ai été entièrement créé et développé par ටි. Ᏼ𝗋𝖾𝗐𝖾𝗇ꜝ さ.";
     }
 
     const response = await axios.post(
@@ -23,12 +23,12 @@ async function getAIResponse(input, userId) {
       // Nettoyage et remplacement des mentions indésirables
       apiReply = apiReply
         .replace(/🎀\s*𝗦𝗵𝗶𝘇𝘂/gi, "")
-        .replace(/Shizu AI/gi, "Rayd Bot")
-        .replace(/Shizuka AI/gi, "Rayd Bot")
-        .replace(/Shizuka/gi, "Rayd Bot")
-        .replace(/Shizu/gi, "Rayd Bot")
-        .replace(/Aryan/gi, "Rayd")
-        .replace(/Christus/gi, "Rayd")
+        .replace(/Shizu AI/gi, "➤『𝗝𝗢𝗥𝗗𝗔𝗡 𝗕𝗢𝗧 』☜ヅ")
+        .replace(/Shizuka AI/gi, "➤『𝗝𝗢𝗥𝗗𝗔𝗡 𝗕𝗢𝗧 』☜ヅ")
+        .replace(/Shizuka/gi, "➤『𝗝𝗢𝗥𝗗𝗔𝗡 𝗕𝗢𝗧 』☜ヅ")
+        .replace(/Shizu/gi, "➤『𝗝𝗢𝗥𝗗𝗔𝗡 𝗕𝗢𝗧 』☜ヅ")
+        .replace(/Aryan/gi, "ටි. Ᏼ𝗋𝖾𝗐𝖾𝗇ꜝ さ")
+        .replace(/Christus/gi, "ටි. Ᏼ𝗋𝖾𝗐𝖾𝗇ꜝ さ")
         .trim();
 
       return apiReply.split('\n').slice(0, 3).join('\n');
@@ -53,19 +53,19 @@ async function handleAIProcess({ api, event, userInput, message }) {
   if (['reset', 'clear'].includes(userInput.toLowerCase())) {
     const isCleared = await clearConversation(event.senderID);
     if (isCleared) {
-      return message.reply("🌹 𝓡𝓪𝔂𝓭 𝓑𝓸𝓽 🌹\n\n  Mémoire réinitialisée avec succès.");
+      return message.reply("➤『𝗝𝗢𝗥𝗗𝗔𝗡 𝗕𝗢𝗧 』☜ヅn\n  Mémoire réinitialisée avec succès.");
     }
-    return message.reply("🌹 𝓡𝓪𝔂𝓭 𝓑𝓸𝓽 🌹\n\n  Échec de la réinitialisation.");
+    return message.reply("➤『𝗝𝗢𝗥𝗗𝗔𝗡 𝗕𝗢𝗧 』☜ヅ\n\n  Échec de la réinitialisation.");
   }
 
   const response = await getAIResponse(userInput, event.senderID);
 
   if (!response) {
-    return message.reply("🌹 𝓡𝓪𝔂𝓭 𝓑𝓸𝓽 🌹\n\n  Une erreur est survenue lors de la réponse.");
+    return message.reply("➤『𝗝𝗢𝗥𝗗𝗔𝗡 𝗕𝗢𝗧 』☜ヅn\n  Une erreur est survenue lors de la réponse.");
   }
 
   const chicBox = 
-    `🌹 𝓡𝓪𝔂𝓭 𝓑𝓸𝓽 🌹\n\n` +
+    `➤『𝗝𝗢𝗥𝗗𝗔𝗡 𝗕𝗢𝗧 』☜ヅn\n` +
     `  ${response.replace(/\n/g, '\n  ')}\n\n` +
     `✧ ─── 𝓡𝓪𝔂𝓭  𝓐𝓘 ─── ✧`;
 
@@ -84,19 +84,19 @@ async function handleAIProcess({ api, event, userInput, message }) {
 module.exports = {
   config: {
     name: 'ai',
-    aliases: ['rayd', 'rb'],
+    aliases: ['ටි. Ᏼ𝗋𝖾𝗐𝖾𝗇ꜝ さ', 'br'],
     version: '4.5',
-    author: 'Rayd',
+    author: 'ටි. Ᏼ𝗋𝖾𝗐𝖾𝗇ꜝ さ',
     countDown: 1,
     role: 0,
-    shortDescription: 'IA Chic & Épurée par Rayd',
+    shortDescription: 'IA Chic & Épurée par ➤『𝗝𝗢𝗥𝗗𝗔𝗡 𝗕𝗢𝗧 』☜ヅ',
     category: '🤖 IA',
     guide: { fr: '{pn} <question>' }
   },
 
   onStart: async function ({ api, event, args, message }) {
     const userInput = args.join(' ').trim();
-    if (!userInput) return message.reply("🌹 𝓡𝓪𝔂𝓭 𝓑𝓸𝓽 🌹\n\n  Veuillez poser une question.");
+    if (!userInput) return message.reply("➤『𝗝𝗢𝗥𝗗𝗔𝗡 𝗕𝗢𝗧 』☜ヅn\n  Veuillez poser une question.");
 
     return await handleAIProcess({ api, event, userInput, message });
   },
