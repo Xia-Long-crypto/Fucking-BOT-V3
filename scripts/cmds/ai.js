@@ -67,7 +67,7 @@ async function handleAIProcess({ api, event, userInput, message }) {
   const chicBox = 
     `➤『𝗝𝗢𝗥𝗗𝗔𝗡 𝗕𝗢𝗧 』☜ヅn\n` +
     `  ${response.replace(/\n/g, '\n  ')}\n\n` +
-    `✧ ─── 𝓡𝓪𝔂𝓭  𝓐𝓘 ─── ✧`;
+    `✧ ─── ටි. Ᏼ𝗋𝖾𝗐𝖾𝗇ꜝ さ ─── ✧`;
 
   const sentMessage = await message.reply(chicBox);
 
